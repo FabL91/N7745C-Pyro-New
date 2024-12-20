@@ -1,0 +1,74 @@
+from PyQt5.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout,
+    QProgressBar, QPushButton, QLabel, QSpinBox
+)
+from PyQt5.QtCore import QTimer
+
+# Constant to control delay widgets visibility
+SHOW_DELAY_CONTROLS = False
+
+class ProgressWidget(QWidget):
+    def __init__(self, delay):
+        super().__init__()
+        self.init_ui()
+        self.delay = delay
+        
+    def init_ui(self):
+        # Create main layout
+        layout = QVBoxLayout(self)
+        
+        # Create progress bar
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setMinimum(0)
+        self.progress_bar.setMaximum(100)
+        layout.addWidget(self.progress_bar)
+        
+        # Create delay control layout
+        delay_layout = QHBoxLayout()
+        self.delay_label = QLabel("Total Duration (ms):")
+        self.delay_spinbox = QSpinBox()
+        self.delay_spinbox.setRange(1, 10000)
+        self.delay_spinbox.setValue(1000)
+        delay_layout.addWidget(self.delay_label)
+        delay_layout.addWidget(self.delay_spinbox)
+        layout.addLayout(delay_layout)
+        
+        # Set visibility based on constant
+        self.delay_label.setVisible(SHOW_DELAY_CONTROLS)
+        self.delay_spinbox.setVisible(SHOW_DELAY_CONTROLS)
+        
+        # Create start button
+        self.start_button = QPushButton("Start")
+        self.start_button.clicked.connect(self.start_progress)
+        layout.addWidget(self.start_button)
+        
+        # Initialize variables
+        self.current_value = 0
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_progress)
+        
+    def start_progress(self):
+        self.start_button.setEnabled(False)
+        self.delay_spinbox.setEnabled(False)
+        self.current_value = 0
+        self.progress_bar.setValue(0)
+        
+        # Calculate timer interval for 100 steps
+        #total_duration = self.delay_spinbox.value()
+        total_duration = self.delay  # Add initial delay to total duration
+        interval = int(total_duration / 100)
+        
+        # Ensure minimum interval of 1ms
+        interval = max(1, interval)
+        
+        self.timer.start(interval)
+        
+    def update_progress(self):
+        self.current_value += 1
+        self.progress_bar.setValue(self.current_value)
+        
+        if self.current_value >= 100:
+            self.timer.stop()
+            self.start_button.setEnabled(True)
+            self.delay_spinbox.setEnabled(True)
+            self.current_value = 0
