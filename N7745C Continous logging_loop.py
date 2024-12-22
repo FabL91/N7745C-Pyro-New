@@ -14,7 +14,7 @@ class LoggingThread(QThread):
     data_ready = pyqtSignal(list)
     start_progress = pyqtSignal(float)  # Signal to start progress with sleep_time
 
-    def __init__(self, n7745c, points, integration_time, time_unit, loop_delay, parent=None):
+    def __init__(self, n7745c, points, integration_time, time_unit, loop_delay, simulate_checkbox, parent=None):
         super().__init__(parent)
         self.n7745c = n7745c
         self.running = False
@@ -22,8 +22,10 @@ class LoggingThread(QThread):
         self.integration_time = integration_time
         self.time_unit = time_unit
         self.loop_delay = loop_delay
+        self.simulate_checkbox = simulate_checkbox
         self.calculate_sleep_time()
 
+        
     def calculate_sleep_time(self):
         if self.time_unit == "US":
             self.sleep_time = (self.points * self.integration_time) / 1_000_000  # Convert to seconds
@@ -34,7 +36,11 @@ class LoggingThread(QThread):
 
     def run(self):
         self.running = True
-        self.n7745c.write(":SENSe2:FUNCtion:STATe LOGG,STAR")  # Enables the logging
+
+        if self.simulate_checkbox:
+            pass
+        else:
+            self.n7745c.write(":SENSe2:FUNCtion:STATe LOGG,STAR")  # Enables the logging
         
         while self.running:
             data_1 = 0
@@ -43,31 +49,36 @@ class LoggingThread(QThread):
             while data_1 == 0 and self.running:
 
                 #data_1 = self.n7745c.query(":SENS2:FUNC:RES:IND?")
-                data_1 = self.n7745c.query("*OPC?")
+                if self.simulate_checkbox:
+                    pass
+                else:
+                    data_1 = self.n7745c.query("*OPC?")
 
             time.sleep(self.sleep_time)
             if self.running:
                 # Emit signal to start progress bar with current sleep_time
                 self.start_progress.emit(self.sleep_time)
                 # Sleep for a short time to avoid excessive CPU usage
-                
-                data = self.n7745c.query_binary_values(':SENSE2:CHANnel:FUNCtion:RESult?', 'f', False)
+                if self.simulate_checkbox:
+                    pass
+                else:
+                    data = self.n7745c.query_binary_values(':SENSE2:CHANnel:FUNCtion:RESult?', 'f', False)
                 print(data)
                 print(len(data))
                 print(f"La valeur de data est toujours {data_1}")
                 self.data_ready.emit(data)
 
-        self.n7745c.write(":SENSe2:FUNCtion:STATe LOGG,STOP")  # Disables the logging
+        if self.simulate_checkbox:
+            pass
+        else:
+            self.n7745c.write(":SENSe2:FUNCtion:STATe LOGG,STOP")  # Disables the logging
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
-
-        # Initialize VISA resource
-        rm = pyvisa.ResourceManager()
-        self.n7745c = rm.open_resource('TCPIP0::169.254.241.203::inst0::INSTR')
-
+        self.Initialize_VISA_resource()
+        
         # Initialize data storage for the scrolling plot
         self.time_data = deque(maxlen=100)
         self.first_point_data = deque(maxlen=100)
@@ -76,6 +87,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update_timer.start(1)
         self.pending_data = None
         self.current_data = []
+
+    def Initialize_VISA_resource(self):
+
+        
+        if self.simulateCheckbox.isChecked():
+            self.n7745c = None  
+        else:
+            rm = pyvisa.ResourceManager()
+            self.n7745c = rm.open_resource('TCPIP0::169.254.241.203::inst0::INSTR')
 
     def initUI(self):
         self.setWindowTitle("N7745C Continuous Logging")
@@ -91,6 +111,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.stopButton.clicked.connect(self.stop_logging)
         button_layout.addWidget(self.startButton)
         button_layout.addWidget(self.stopButton)
+        layout.addLayout(button_layout)
+
+        # Add the checkbox "Simuler"
+        self.simulateCheckbox = QtWidgets.QCheckBox("Simuler")
+        self.simulateCheckbox.setChecked(True) # Set the checkbox to True by default
+        button_layout.addWidget(self.simulateCheckbox)
         layout.addLayout(button_layout)
 
         # Input fields
@@ -150,14 +176,18 @@ class MainWindow(QtWidgets.QMainWindow):
             self.cursor_y_edit.setText(f"{y:.2f}")
 
     def start_logging(self):
+        self.logging_started = True
         points = int(self.pointsLineEdit.text())
         integration_time = int(self.integrationTimeLineEdit.text())
         time_unit = self.timeUnitComboBox.currentText()
         loop_delay = float(self.delayLineEdit.text())
+
+        if self.simulateCheckbox.isChecked():
+            pass
+        else:
+            self.n7745c.write(f":SENSe2:FUNCtion:PARameter:LOGGing {points},{integration_time} {time_unit}")
         
-        self.n7745c.write(f":SENSe2:FUNCtion:PARameter:LOGGing {points},{integration_time} {time_unit}")
-        
-        self.logging_thread = LoggingThread(self.n7745c, points, integration_time, time_unit, loop_delay)
+        self.logging_thread = LoggingThread(self.n7745c, points, integration_time, time_unit, loop_delay, self.simulateCheckbox)
         self.logging_thread.data_ready.connect(self.update_plot)
         self.logging_thread.start_progress.connect(self.start_progress_bar)
         self.logging_thread.start()
@@ -175,6 +205,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.progress_widget.start_progress(delay_ms)
 
     def stop_logging(self):
+        self.logging_started = False
         self.logging_thread.running = False
         self.logging_thread.wait()
         self.startButton.setEnabled(True)
@@ -213,9 +244,23 @@ class MainWindow(QtWidgets.QMainWindow):
             self.pending_data = None
 
     def closeEvent(self, event):
-        self.stop_logging()
-        self.n7745c.close()
-        event.accept()
+
+        reply = QtWidgets.QMessageBox.question(self, 'Message',
+        "Are you sure you want to quit?", QtWidgets.QMessageBox.Yes | 
+        QtWidgets.QMessageBox.No, QtWidgets.QMessageBox.No)
+
+        if reply == QtWidgets.QMessageBox.Yes:
+            if hasattr(self, 'logging_started') and self.logging_started:
+                self.stop_logging()
+            event.accept()
+        else:
+            event.ignore()
+
+        if self.simulateCheckbox.isChecked():
+            pass
+        else:
+            self.n7745c.close()
+            
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
