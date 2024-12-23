@@ -1,6 +1,7 @@
 import sys
 import time
 import numpy as np
+import random
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer
 import matplotlib.pyplot as plt
@@ -50,7 +51,7 @@ class LoggingThread(QThread):
 
                 #data_1 = self.n7745c.query(":SENS2:FUNC:RES:IND?")
                 if self.simulate_checkbox:
-                    pass
+                    data_1 = 1
                 else:
                     data_1 = self.n7745c.query("*OPC?")
 
@@ -60,7 +61,7 @@ class LoggingThread(QThread):
                 self.start_progress.emit(self.sleep_time)
                 # Sleep for a short time to avoid excessive CPU usage
                 if self.simulate_checkbox:
-                    pass
+                    data = [random.randint(0, 10) for _ in range(self.points)]
                 else:
                     data = self.n7745c.query_binary_values(':SENSE2:CHANnel:FUNCtion:RESult?', 'f', False)
                 print(data)
@@ -105,36 +106,50 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Buttons
         button_layout = QtWidgets.QHBoxLayout()
+        
         self.startButton = QtWidgets.QPushButton("Start")
         self.stopButton = QtWidgets.QPushButton("Stop")
         self.startButton.clicked.connect(self.start_logging)
         self.stopButton.clicked.connect(self.stop_logging)
         button_layout.addWidget(self.startButton)
         button_layout.addWidget(self.stopButton)
-        layout.addLayout(button_layout)
+        #layout.addLayout(button_layout)
 
         # Add the checkbox "Simuler"
         self.simulateCheckbox = QtWidgets.QCheckBox("Simuler")
         self.simulateCheckbox.setChecked(True) # Set the checkbox to True by default
         button_layout.addWidget(self.simulateCheckbox)
+        #layout.addLayout(button_layout)
+
+        # Add button_layout to the main layout
         layout.addLayout(button_layout)
 
         # Input fields
+        groupBox = QtWidgets.QGroupBox("Settings")
         input_layout = QtWidgets.QHBoxLayout()
-        self.pointsLineEdit = QtWidgets.QLineEdit("10")
+        self.pointsLineEdit = QtWidgets.QLineEdit("100")
         self.integrationTimeLineEdit = QtWidgets.QLineEdit("10")
         self.timeUnitComboBox = QtWidgets.QComboBox()
         self.timeUnitComboBox.addItems(["US", "MS", "S"])
         self.timeUnitComboBox.setCurrentText("MS")
+
+
         input_layout.addWidget(QtWidgets.QLabel("Number of Points:"))
         input_layout.addWidget(self.pointsLineEdit)
         input_layout.addWidget(QtWidgets.QLabel("Integration Time:"))
         input_layout.addWidget(self.integrationTimeLineEdit)
         input_layout.addWidget(self.timeUnitComboBox)
+
+        groupBox.setLayout(input_layout)
+
+        # Ajout du groupBox au layout principal
+        layout.addWidget(groupBox)
+
         self.delayLineEdit = QtWidgets.QLineEdit("0.1")
         input_layout.addWidget(QtWidgets.QLabel("Loop Delay (s):"))
         input_layout.addWidget(self.delayLineEdit)
-        layout.addLayout(input_layout)
+        #layout.addLayout(input_layout)
+        #self.setLayout(layout)
 
         # Cursor position display
         cursor_layout = QtWidgets.QHBoxLayout()
