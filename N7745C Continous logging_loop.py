@@ -151,17 +151,7 @@ class MainWindow(QtWidgets.QMainWindow):
         #layout.addLayout(input_layout)
         #self.setLayout(layout)
 
-        # Cursor position display
-        cursor_layout = QtWidgets.QHBoxLayout()
-        self.cursor_x_edit = QtWidgets.QLineEdit()
-        self.cursor_y_edit = QtWidgets.QLineEdit()
-        self.cursor_x_edit.setReadOnly(True)
-        self.cursor_y_edit.setReadOnly(True)
-        cursor_layout.addWidget(QtWidgets.QLabel("Cursor X:"))
-        cursor_layout.addWidget(self.cursor_x_edit)
-        cursor_layout.addWidget(QtWidgets.QLabel("Cursor Y:"))
-        cursor_layout.addWidget(self.cursor_y_edit)
-        layout.addLayout(cursor_layout)
+        
 
         """# Custom Progress Widget
         self.progress_widget = ProgressWidget()
@@ -180,15 +170,7 @@ class MainWindow(QtWidgets.QMainWindow):
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
-        # Set up the cursor
-        self.cursor = Cursor(self.ax1, useblit=True, color='red', linewidth=1)
-        self.canvas1.mpl_connect('motion_notify_event', self.on_mouse_move)
-
-    def on_mouse_move(self, event):
-        if event.inaxes:
-            x, y = event.xdata, event.ydata
-            self.cursor_x_edit.setText(f"{x:.2f}")
-            self.cursor_y_edit.setText(f"{y:.2f}")
+        
 
     def start_logging(self):
         self.logging_started = True
