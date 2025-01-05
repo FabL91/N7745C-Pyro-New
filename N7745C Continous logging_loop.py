@@ -9,7 +9,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.widgets import Cursor
 import pyvisa
 from collections import deque
-from progress_widget import ProgressWidget
+#from progress_widget import ProgressWidget
 
 class LoggingThread(QThread):
     data_ready = pyqtSignal(list)
@@ -163,9 +163,9 @@ class MainWindow(QtWidgets.QMainWindow):
         cursor_layout.addWidget(self.cursor_y_edit)
         layout.addLayout(cursor_layout)
 
-        # Custom Progress Widget
+        """# Custom Progress Widget
         self.progress_widget = ProgressWidget()
-        layout.addWidget(self.progress_widget)
+        layout.addWidget(self.progress_widget)"""
 
         # Matplotlib figures
         self.figure1, self.ax1 = plt.subplots()
@@ -217,7 +217,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def start_progress_bar(self, sleep_time):
         # Convert sleep_time to milliseconds for the progress widget
         delay_ms = int(sleep_time * 1000)
-        self.progress_widget.start_progress(delay_ms)
+        #self.progress_widget.start_progress(delay_ms)
 
     def stop_logging(self):
         self.logging_started = False
