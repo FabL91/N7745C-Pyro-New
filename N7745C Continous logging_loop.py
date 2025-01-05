@@ -79,7 +79,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.initUI()
         self.Initialize_VISA_resource()
-        
+
         # Initialize data storage for the scrolling plot
         self.time_data = deque(maxlen=100)
         self.first_point_data = deque(maxlen=100)
@@ -91,7 +91,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def Initialize_VISA_resource(self):
 
-        
+
         if self.simulateCheckbox.isChecked():
             self.n7745c = None  
         else:
@@ -99,76 +99,23 @@ class MainWindow(QtWidgets.QMainWindow):
             self.n7745c = rm.open_resource('TCPIP0::169.254.241.203::inst0::INSTR')
 
     def initUI(self):
-        self.setWindowTitle("N7745C Continuous Logging")
-        self.setGeometry(100, 100, 800, 800)
+        # Load the UI file
+        uic.loadUi('n7745c_gui.ui', self)
 
-        layout = QtWidgets.QVBoxLayout()
-
-        # Buttons
-        button_layout = QtWidgets.QHBoxLayout()
-        
-        self.startButton = QtWidgets.QPushButton("Start")
-        self.stopButton = QtWidgets.QPushButton("Stop")
+        # Connect buttons
         self.startButton.clicked.connect(self.start_logging)
         self.stopButton.clicked.connect(self.stop_logging)
-        button_layout.addWidget(self.startButton)
-        button_layout.addWidget(self.stopButton)
-        #layout.addLayout(button_layout)
 
-        # Add the checkbox "Simuler"
-        self.simulateCheckbox = QtWidgets.QCheckBox("Simuler")
-        self.simulateCheckbox.setChecked(True) # Set the checkbox to True by default
-        button_layout.addWidget(self.simulateCheckbox)
-        #layout.addLayout(button_layout)
-
-        # Add button_layout to the main layout
-        layout.addLayout(button_layout)
-
-        # Input fields
-        groupBox = QtWidgets.QGroupBox("Settings")
-        input_layout = QtWidgets.QHBoxLayout()
-        self.pointsLineEdit = QtWidgets.QLineEdit("100")
-        self.integrationTimeLineEdit = QtWidgets.QLineEdit("10")
-        self.timeUnitComboBox = QtWidgets.QComboBox()
-        self.timeUnitComboBox.addItems(["US", "MS", "S"])
-        self.timeUnitComboBox.setCurrentText("MS")
-
-
-        input_layout.addWidget(QtWidgets.QLabel("Number of Points:"))
-        input_layout.addWidget(self.pointsLineEdit)
-        input_layout.addWidget(QtWidgets.QLabel("Integration Time:"))
-        input_layout.addWidget(self.integrationTimeLineEdit)
-        input_layout.addWidget(self.timeUnitComboBox)
-
-        groupBox.setLayout(input_layout)
-
-        # Ajout du groupBox au layout principal
-        layout.addWidget(groupBox)
-
-        self.delayLineEdit = QtWidgets.QLineEdit("0.1")
-        input_layout.addWidget(QtWidgets.QLabel("Loop Delay (s):"))
-        input_layout.addWidget(self.delayLineEdit)
-        #layout.addLayout(input_layout)
-        #self.setLayout(layout)
-
-        
-
-        """# Custom Progress Widget
-        self.progress_widget = ProgressWidget()
-        layout.addWidget(self.progress_widget)"""
-
-        # Matplotlib figures
+        # Set up matplotlib figures
         self.figure1, self.ax1 = plt.subplots()
         self.canvas1 = FigureCanvas(self.figure1)
-        layout.addWidget(self.canvas1)
+        self.plotWidget1.setLayout(QtWidgets.QVBoxLayout())
+        self.plotWidget1.layout().addWidget(self.canvas1)
 
         self.figure2, self.ax2 = plt.subplots()
         self.canvas2 = FigureCanvas(self.figure2)
-        layout.addWidget(self.canvas2)
-
-        widget = QtWidgets.QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
+        self.plotWidget2.setLayout(QtWidgets.QVBoxLayout())
+        self.plotWidget2.layout().addWidget(self.canvas2)
 
         
 
