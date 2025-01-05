@@ -14,115 +14,136 @@
    <string>N7745C Continuous Logging</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="mainHorizontalLayout">
     <item>
-     <widget class="QGroupBox" name="controlGroupBox">
-      <property name="title">
-       <string>Control</string>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QGroupBox" name="controlGroupBox">
+        <property name="title">
+         <string>Control</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="startButton">
+           <property name="text">
+            <string>Start</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="stopButton">
+           <property name="text">
+            <string>Stop</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="simulateCheckbox">
+           <property name="text">
+            <string>Simuler</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="settingsGroupBox">
+        <property name="title">
+         <string>Settings</string>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Number of Points:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="pointsLineEdit">
+           <property name="text">
+            <string>100</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Integration Time:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="integrationTimeLineEdit">
+           <property name="text">
+            <string>10</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="timeUnitComboBox">
+           <item>
+            <property name="text">
+             <string>US</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>MS</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>S</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Loop Delay (s):</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="delayLineEdit">
+           <property name="text">
+            <string>0.1</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="plotWidget1" native="true"/>
+      </item>
+      <item>
+       <widget class="QWidget" name="plotWidget2" native="true"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="tabPosition">
+       <enum>QTabWidget::North</enum>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QPushButton" name="startButton">
-         <property name="text">
-          <string>Start</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="stopButton">
-         <property name="text">
-          <string>Stop</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="simulateCheckbox">
-         <property name="text">
-          <string>Simuler</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QWidget" name="tab1">
+       <attribute name="title">
+        <string>Onglet 1</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab2">
+       <attribute name="title">
+        <string>Onglet 2</string>
+       </attribute>
+      </widget>
      </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="settingsGroupBox">
-      <property name="title">
-       <string>Settings</string>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Number of Points:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="pointsLineEdit">
-         <property name="text">
-          <string>100</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Integration Time:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="integrationTimeLineEdit">
-         <property name="text">
-          <string>10</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="timeUnitComboBox">
-         <item>
-          <property name="text">
-           <string>US</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>MS</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>S</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Loop Delay (s):</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="delayLineEdit">
-         <property name="text">
-          <string>0.1</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QWidget" name="plotWidget1" native="true"/>
-    </item>
-    <item>
-     <widget class="QWidget" name="plotWidget2" native="true"/>
     </item>
    </layout>
   </widget>
