@@ -28,12 +28,39 @@ class LoggingThread(QThread):
 
         
     def calculate_sleep_time(self):
+        """
+        Calculate the sleep time based on the number of points, integration time, and time unit.
+
+        This method computes the total sleep time required for data acquisition by multiplying
+        the number of points by the integration time and converting the result to seconds
+        based on the specified time unit.
+
+        The calculated sleep time is stored in the `self.sleep_time` attribute.
+
+        Parameters:
+        -----------
+        self : object
+            The instance of the class containing the method.
+            Expected to have the following attributes:
+            - time_unit : str
+                The unit of time for integration. Can be "US" (microseconds), "MS" (milliseconds), or "S" (seconds).
+            - points : int
+                The number of data points to be collected.
+            - integration_time : float
+                The integration time for each data point.
+
+        Returns:
+        --------
+        None
+            The method doesn't return a value but updates the `self.sleep_time` attribute.
+        """
         if self.time_unit == "US":
             self.sleep_time = (self.points * self.integration_time) / 1_000_000  # Convert to seconds
         elif self.time_unit == "MS":
             self.sleep_time = (self.points * self.integration_time) / 1000  # Convert to seconds
         else:  # "S"
             self.sleep_time = self.points * self.integration_time
+
 
     def run(self):
         self.running = True
