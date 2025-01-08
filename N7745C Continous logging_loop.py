@@ -133,17 +133,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.startButton.clicked.connect(self.start_logging)
         self.stopButton.clicked.connect(self.stop_logging)
 
+        # Set minimum size for the main window
+        self.setMinimumSize(600, 400)
         # Set up matplotlib figures
-        self.figure1, self.ax1 = plt.subplots()
+        self.figure1, self.ax1 = plt.subplots(figsize=(5, 4))
         self.canvas1 = FigureCanvas(self.figure1)
         self.plotWidget1.setLayout(QtWidgets.QVBoxLayout())
         self.plotWidget1.layout().addWidget(self.canvas1)
+        self.plotWidget1.setMinimumSize(300, 200)
 
-        self.figure2, self.ax2 = plt.subplots()
+        self.figure2, self.ax2 = plt.subplots(figsize=(5, 4))
         self.canvas2 = FigureCanvas(self.figure2)
         self.plotWidget2.setLayout(QtWidgets.QVBoxLayout())
         self.plotWidget2.layout().addWidget(self.canvas2)
-
+        self.plotWidget2.setMinimumSize(300, 200)
+        
+    def safe_set_figure_size(self, figure, canvas):
+        width = max(1, canvas.width() / self.logicalDpiX())
+        height = max(1, canvas.height() / self.logicalDpiY())
+        figure.set_size_inches(width, height, forward=False)
+        canvas.draw()
         
 
     def start_logging(self):
@@ -191,7 +200,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ax1.set_title('N7745C Logging Data')
         self.ax1.set_xlabel('Sample')
         self.ax1.set_ylabel('Value')
-        self.canvas1.draw()
+        self.safe_set_figure_size(self.figure1, self.canvas1)
 
         # Store the new data point for the second graph
         self.pending_data = data[0]
@@ -210,7 +219,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ax2.set_xlabel('Time')
             self.ax2.set_ylabel('Value')
             self.ax2.set_xlim(max(0, self.time_data[-1] - 100), self.time_data[-1])
-            self.canvas2.draw()
+            self.safe_set_figure_size(self.figure2, self.canvas2)
 
             self.pending_data = None
 
@@ -231,6 +240,10 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
         else:
             self.n7745c.close()
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.safe_set_figure_size(self.figure1, self.canvas1)
+        self.safe_set_figure_size(self.figure2, self.canvas2)
             
 
 if __name__ == '__main__':

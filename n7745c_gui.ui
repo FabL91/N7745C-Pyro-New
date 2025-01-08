@@ -120,12 +120,6 @@
         </layout>
        </widget>
       </item>
-      <item>
-       <widget class="QWidget" name="plotWidget1" native="true"/>
-      </item>
-      <item>
-       <widget class="QWidget" name="plotWidget2" native="true"/>
-      </item>
      </layout>
     </item>
     <item>
@@ -137,6 +131,14 @@
        <attribute name="title">
         <string>Onglet 1</string>
        </attribute>
+       <layout class="QVBoxLayout" name="verticalLayoutTab1">
+        <item>
+         <widget class="QWidget" name="plotWidget1" native="true"/>
+        </item>
+        <item>
+         <widget class="QWidget" name="plotWidget2" native="true"/>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab2">
        <attribute name="title">
