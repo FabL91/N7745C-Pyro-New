@@ -141,12 +141,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.plotWidget1.setLayout(QtWidgets.QVBoxLayout())
         self.plotWidget1.layout().addWidget(self.canvas1)
         self.plotWidget1.setMinimumSize(300, 200)
+        
+        # Add cursor functionality for zooming and panning
+        self.cursor_ax1 = Cursor(self.ax1, color='red', linewidth=1)
 
         self.figure2, self.ax2 = plt.subplots(figsize=(5, 4))
         self.canvas2 = FigureCanvas(self.figure2)
         self.plotWidget2.setLayout(QtWidgets.QVBoxLayout())
         self.plotWidget2.layout().addWidget(self.canvas2)
         self.plotWidget2.setMinimumSize(300, 200)
+        
+        # Add cursor functionality for zooming and panning
+        self.cursor_ax2 = Cursor(self.ax2, color='red', linewidth=1)
         
     def safe_set_figure_size(self, figure, canvas):
         width = max(1, canvas.width() / self.logicalDpiX())
